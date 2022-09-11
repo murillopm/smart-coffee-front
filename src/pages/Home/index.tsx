@@ -1,3 +1,6 @@
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import zod from 'zod'
 import {
   HomeWrapper,
   InputError,
@@ -8,10 +11,8 @@ import {
   RegisterInputLabel,
 } from './styles'
 import expressoImg from '../../assets/images/coffee.svg'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import zod from 'zod'
 import { api } from '../../services/api'
+import { useNavigate } from 'react-router-dom'
 
 const schema = zod.object({
   name: zod.string().min(5, {
@@ -32,6 +33,7 @@ export function Home() {
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(schema),
   })
+  const navigate = useNavigate()
 
   async function handleRegisterSubmit(user: RegisterFormInputs) {
     try {
@@ -40,6 +42,7 @@ export function Home() {
         email: user.email,
       })
       console.log(data)
+      navigate('/order', { replace: true })
     } catch (error: any) {
       window.alert(error.response.data.error)
     }

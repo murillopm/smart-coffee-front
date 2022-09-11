@@ -1,5 +1,4 @@
-import { createContext, ReactNode, useEffect, useState } from 'react'
-import { api } from '../services/api'
+import { createContext, ReactNode } from 'react'
 
 type Ingredient = {
   ingredient_id: number
@@ -15,9 +14,9 @@ type Recipe = {
   ingredients: Ingredient[]
 }
 
-type RecipesResponseData = {
-  results: Recipe[]
-}
+// type RecipesResponseData = {
+//   results: Recipe[]
+// }
 
 interface CoffeeCartContextType {
   recipesList: Recipe[]
@@ -32,22 +31,8 @@ export const CoffeeCartContext = createContext({} as CoffeeCartContextType)
 export function CoffeeCartContextProvider({
   children,
 }: CartContextProviderProps) {
-  const [recipesList, setRecipesList] = useState<Recipe[]>([])
-  async function fetchRecipes() {
-    try {
-      const { data } = await api.get<RecipesResponseData>('/recipes')
-      setRecipesList(data.results)
-    } catch (error: any) {
-      console.log(error.response.data.error)
-    }
-  }
-
-  useEffect(() => {
-    fetchRecipes()
-  }, [])
-
   return (
-    <CoffeeCartContext.Provider value={{ recipesList }}>
+    <CoffeeCartContext.Provider value={{ recipesList: [] }}>
       {children}
     </CoffeeCartContext.Provider>
   )
