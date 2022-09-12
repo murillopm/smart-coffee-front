@@ -38,13 +38,13 @@ export const RegisterInput = styled.input`
   height: 45px;
   border: 1px solid ${(props) => props.theme['gray-200']};
   border-radius: 3px;
-  color: #212121;
+  color: ${(props) => props.theme['gray-900']};
 `
 
 export const InputError = styled.p`
   color: red;
   padding: 0 6px;
-  font-size: 14px;
+  font-size: 0.875rem;
 `
 
 export const RegisterInputLabel = styled.label`
@@ -62,7 +62,7 @@ export const RegisterButton = styled.button`
   letter-spacing: 3px;
   text-transform: uppercase;
   color: white;
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: ${(props) => props.theme.blue};
   transition: background-color 0.1s;
   cursor: pointer;

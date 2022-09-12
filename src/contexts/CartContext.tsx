@@ -1,4 +1,4 @@
-import { createContext, ReactNode } from 'react'
+import { createContext, ReactNode, useState } from 'react'
 
 type Ingredient = {
   ingredient_id: number
@@ -7,19 +7,24 @@ type Ingredient = {
   ingredient_photo: string
 }
 
-type Recipe = {
+type Coffee = {
   recipe_id: number
   recipe_name: string
   recipe_photo: string
   ingredients: Ingredient[]
 }
 
-// type RecipesResponseData = {
-//   results: Recipe[]
-// }
+type User = {
+  name: string
+  email: string
+  couponCode: string
+}
 
 interface CoffeeCartContextType {
-  recipesList: Recipe[]
+  activeUser: User | undefined
+  coffeeCart: Coffee[]
+  registerActiveUser: (data: User) => void
+  registerSelectedCoffees: (data: Coffee[]) => void
 }
 
 interface CartContextProviderProps {
@@ -31,8 +36,26 @@ export const CoffeeCartContext = createContext({} as CoffeeCartContextType)
 export function CoffeeCartContextProvider({
   children,
 }: CartContextProviderProps) {
+  const [activeUser, setActiveUser] = useState<User | undefined>(undefined)
+  const [coffeeCart, setCoffeeCart] = useState<Coffee[]>([])
+
+  function registerActiveUser(data: User) {
+    setActiveUser(data)
+  }
+
+  function registerSelectedCoffees(data: Coffee[]) {
+    setCoffeeCart(data)
+  }
+
   return (
-    <CoffeeCartContext.Provider value={{ recipesList: [] }}>
+    <CoffeeCartContext.Provider
+      value={{
+        activeUser,
+        registerActiveUser,
+        coffeeCart,
+        registerSelectedCoffees,
+      }}
+    >
       {children}
     </CoffeeCartContext.Provider>
   )

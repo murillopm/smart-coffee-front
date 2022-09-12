@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 
 export const OrderPageWrapper = styled.div`
-  /* height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,44 +8,7 @@ export const OrderPageWrapper = styled.div`
   position: relative;
 `
 
-export const BrandWrapper = styled.header`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 80px;
-
-  img {
-    height: 70px;
-    width: 70px;
-  }
-`
-
-export const BrandInfoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-end;
-
-  p {
-    font-size: 2rem;
-    color: ${(props) => props.theme['brown-200']};
-    letter-spacing: 2px;
-  }
-
-  span {
-    font-size: 0.85rem;
-    color: ${(props) => props.theme['brown-100']};
-  }
-`
-
-export const Divider = styled.div`
-  width: 100%;
-  margin: 10px auto 0;
-  border: 1px solid ${(props) => props.theme['gray-200']};
-`
-
-export const RecipesWrapper = styled.ul`
+export const CoffeesWrapper = styled.ul`
   margin-top: 20px;
   height: 100%;
   width: 100%;
@@ -56,7 +18,7 @@ export const RecipesWrapper = styled.ul`
   list-style: none;
 `
 
-export const RecipeItem = styled.li`
+export const CoffeeItem = styled.li`
   height: 120px;
   width: 100%;
   display: flex;

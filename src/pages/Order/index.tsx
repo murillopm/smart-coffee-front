@@ -1,19 +1,18 @@
 import {
-  BrandInfoWrapper,
-  BrandWrapper,
   CheckboxButton,
   CoffeeDetails,
   CoffeePreparationTime,
   ContinueButton,
-  Divider,
   OrderPageWrapper,
-  RecipeItem,
-  RecipesWrapper,
+  CoffeeItem,
+  CoffeesWrapper,
 } from './styles'
-import expressoImg from '../../assets/images/coffee.svg'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { api } from '../../services/api'
 import { CheckCircle, Circle, ClockClockwise } from 'phosphor-react'
+import { CoffeeCartContext } from '../../contexts/CartContext'
+import { useNavigate } from 'react-router-dom'
+import { BrandHeader } from '../../components/BrandHeader'
 
 type Ingredient = {
   ingredient_id: number
@@ -22,7 +21,7 @@ type Ingredient = {
   ingredient_photo: string
 }
 
-type Recipe = {
+type Coffee = {
   recipe_id: number
   recipe_name: string
   recipe_photo: string
@@ -30,29 +29,35 @@ type Recipe = {
 }
 
 type RecipesResponseData = {
-  results: Recipe[]
+  results: Coffee[]
 }
 
 export function Order() {
-  const [recipesList, setRecipesList] = useState<Recipe[]>([])
-  const [selectedRecipesIds, setSelectedRecipesIds] = useState<number[]>([1])
+  const [coffeeList, setCoffeeList] = useState<Coffee[]>([])
+  const [selectedCoffees, setSelectedCoffees] = useState<Coffee[]>([])
+  const { activeUser, registerSelectedCoffees } = useContext(CoffeeCartContext)
+  const navigate = useNavigate()
 
-  const maxRecipesToBeSelected = 2
-  const isRecipeAdditionAllowed =
-    selectedRecipesIds.length < maxRecipesToBeSelected
+  const maxCoffeesToBeSelected = 2
+  const isCoffeeAdditionAllowed =
+    selectedCoffees.length < maxCoffeesToBeSelected
 
   async function fetchRecipes() {
     try {
       const { data } = await api.get<RecipesResponseData>('/recipes')
-      setRecipesList(data.results)
+      setCoffeeList(data.results)
     } catch (error: any) {
       console.log(error.response.data.error)
     }
   }
 
   useEffect(() => {
-    fetchRecipes()
-  }, [])
+    if (activeUser) {
+      fetchRecipes()
+    } else {
+      navigate('/', { replace: true })
+    }
+  }, [activeUser, navigate])
 
   function calculateCoffeePreparationTime(ingredients: Ingredient[]) {
     const totalSeconds = ingredients.reduce((acc, ingredient) => {
@@ -67,63 +72,73 @@ export function Order() {
     return minutes + ':' + seconds + ' min'
   }
 
-  function isRecipeSelected(recipeId: number) {
-    return selectedRecipesIds.findIndex((recipe) => recipe === recipeId) !== -1
+  function isCoffeeSelected(recipeId: number) {
+    return (
+      selectedCoffees.findIndex((coffee) => coffee.recipe_id === recipeId) !==
+      -1
+    )
   }
 
   function handleCheckboxClick(recipeId: number) {
-    const isRecipeAlreadySelected = selectedRecipesIds.find(
-      (recipe) => recipe === recipeId,
+    const isCoffeeAlreadySelected = selectedCoffees.find(
+      (recipe) => recipe.recipe_id === recipeId,
     )
-    if (isRecipeAlreadySelected) {
-      const newSelectedRecipesArray = selectedRecipesIds.filter(
-        (item) => item !== recipeId,
+    if (isCoffeeAlreadySelected) {
+      const newSelectedCoffeesArray = selectedCoffees.filter(
+        (coffee) => coffee.recipe_id !== recipeId,
       )
-      setSelectedRecipesIds(newSelectedRecipesArray)
+      setSelectedCoffees(newSelectedCoffeesArray)
     } else {
-      if (isRecipeAdditionAllowed) {
-        setSelectedRecipesIds((state) => [...state, recipeId])
+      if (isCoffeeAdditionAllowed) {
+        const coffeeSelectedExists = coffeeList.find(
+          (coffee) => coffee.recipe_id === recipeId,
+        )
+        if (coffeeSelectedExists) {
+          setSelectedCoffees((state) => [...state, coffeeSelectedExists])
+        }
       }
+    }
+  }
+
+  function handleContinueClick() {
+    const isCartEmpty = selectedCoffees.length === 0
+    if (isCartEmpty) {
+      console.log('nao quer cafe')
+    } else {
+      registerSelectedCoffees(selectedCoffees)
     }
   }
 
   return (
     <OrderPageWrapper>
-      <BrandWrapper>
-        <img src={expressoImg} alt="" />
-        <BrandInfoWrapper>
-          <p>Smart Coffee</p>
-          <span>by Alboom</span>
-        </BrandInfoWrapper>
-      </BrandWrapper>
-      <Divider />
-      <RecipesWrapper>
-        {recipesList.map((recipe) => (
-          <RecipeItem key={recipe.recipe_id}>
-            <img src={`./src/assets/${recipe.recipe_photo}`} alt="" />
+      <BrandHeader />
+      <CoffeesWrapper>
+        {coffeeList.map((coffee) => (
+          <CoffeeItem key={coffee.recipe_id}>
+            <img src={`./src/assets/${coffee.recipe_photo}`} alt="" />
             <CoffeeDetails>
-              <p>{decodeURIComponent(escape(recipe.recipe_name))}</p>
+              <p>{decodeURIComponent(escape(coffee.recipe_name))}</p>
               <CoffeePreparationTime>
                 <ClockClockwise size={15} />
-                {calculateCoffeePreparationTime(recipe.ingredients)}
+                {calculateCoffeePreparationTime(coffee.ingredients)}
               </CoffeePreparationTime>
             </CoffeeDetails>
             <CheckboxButton
-              onClick={() => handleCheckboxClick(recipe.recipe_id)}
+              onClick={() => handleCheckboxClick(coffee.recipe_id)}
               isAllowed={
-                isRecipeSelected(recipe.recipe_id) || isRecipeAdditionAllowed
+                isCoffeeSelected(coffee.recipe_id) || isCoffeeAdditionAllowed
               }
             >
-              {isRecipeSelected(recipe.recipe_id) ? (
+              {isCoffeeSelected(coffee.recipe_id) ? (
                 <CheckCircle size={40} weight="fill" color="#4ED9A6" />
               ) : (
                 <Circle size={40} />
               )}
             </CheckboxButton>
-          </RecipeItem>
+          </CoffeeItem>
         ))}
-      </RecipesWrapper>
-      <ContinueButton>Continuar</ContinueButton>
+      </CoffeesWrapper>
+      <ContinueButton onClick={handleContinueClick}>Continuar</ContinueButton>
     </OrderPageWrapper>
   )
 }

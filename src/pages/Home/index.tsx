@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import zod from 'zod'
@@ -11,8 +13,18 @@ import {
   RegisterInputLabel,
 } from './styles'
 import expressoImg from '../../assets/images/coffee.svg'
+
+import { CoffeeCartContext } from '../../contexts/CartContext'
 import { api } from '../../services/api'
-import { useNavigate } from 'react-router-dom'
+
+interface RegisterUserApiResponse {
+  message: string
+  user: {
+    name: string
+    email: string
+    couponCode: string
+  }
+}
 
 const schema = zod.object({
   name: zod.string().min(5, {
@@ -33,18 +45,24 @@ export function Home() {
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(schema),
   })
+  const { registerActiveUser } = useContext(CoffeeCartContext)
   const navigate = useNavigate()
 
   async function handleRegisterSubmit(user: RegisterFormInputs) {
+    console.log('entrou')
     try {
-      const { data } = await api.post('/register', {
+      console.log('dentro do try')
+      const { data } = await api.post<RegisterUserApiResponse>('/register', {
         name: user.name,
         email: user.email,
       })
       console.log(data)
+      console.log('vai registrar')
+      registerActiveUser(data.user)
+      console.log('registrou')
       navigate('/order', { replace: true })
     } catch (error: any) {
-      window.alert(error.response.data.error)
+      console.log(error.response)
     }
   }
 
