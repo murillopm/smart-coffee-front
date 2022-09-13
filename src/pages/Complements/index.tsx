@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CheckCircle, Circle, ClockClockwise } from 'phosphor-react'
-import { BrandHeader } from '../../../components/BrandHeader'
-import { CoffeeCartContext } from '../../../contexts/CartContext'
-import { api } from '../../../services/api'
+import { BrandHeader } from '../../components/BrandHeader'
+import { CoffeeCartContext } from '../../contexts/CartContext'
+import { api } from '../../services/api'
 import {
   calculateCoffeePreparationTime,
   convertCoffeePreparationTimeToString,
-} from '../../../utils/CoffeePreparationToString'
+} from '../../utils/CoffeePreparationToString'
 import {
   CheckboxButton,
   CoffeeComplementDetails,
@@ -49,6 +49,15 @@ interface GetComplementsApiResponse {
   results: ComplementsByCoffee[]
 }
 
+type Order = {
+  recipe_id: number
+  complement_ids: number[]
+}
+interface RegisterOrderApiRequest {
+  user_id: number
+  orders: Order[]
+}
+
 export function Complements() {
   const [complementsList, setComplementsList] = useState<ComplementsByCoffee[]>(
     [],
@@ -56,7 +65,8 @@ export function Complements() {
   const [complementsSelected, setComplementsSelected] = useState<
     ComplementsByCoffee[]
   >([])
-  const { coffeeCart } = useContext(CoffeeCartContext)
+  const { coffeeCart, registerSelectedCoffees, activeUser } =
+    useContext(CoffeeCartContext)
   const navigate = useNavigate()
 
   const filteredComplementsList: ComplementsByCoffee[] = []
@@ -70,21 +80,23 @@ export function Complements() {
     }
   }
 
-  const coffeeCartWithComplements: Coffee[] = coffeeCart.map((coffee) => {
-    const complements = filteredComplementsList.find(
-      (complement) => complement.recipe_id === coffee.recipe_id,
-    )?.ingredients
-    if (complements) {
+  const coffeeCartWithPossibleComplements: Coffee[] = coffeeCart.map(
+    (coffee) => {
+      const complements = filteredComplementsList.find(
+        (complement) => complement.recipe_id === coffee.recipe_id,
+      )?.ingredients
+      if (complements) {
+        return {
+          ...coffee,
+          complements,
+        }
+      }
       return {
         ...coffee,
-        complements,
+        complements: [],
       }
-    }
-    return {
-      ...coffee,
-      complements: [],
-    }
-  })
+    },
+  )
 
   async function fetchCoffeeComplements() {
     try {
@@ -104,7 +116,7 @@ export function Complements() {
     }
   }, [navigate, coffeeCart])
 
-  function handleCheckboxClick(recipeId: number, complement: Ingredient) {
+  function handleComplementSelection(recipeId: number, complement: Ingredient) {
     const recipeIndex = complementsSelected.findIndex(
       (recipe) => recipe.recipe_id === recipeId,
     )
@@ -181,8 +193,47 @@ export function Complements() {
     return isComplementSelected
   }
 
-  function handleContinueClick() {
-    console.log('continuar')
+  async function handleOrderButton() {
+    const finalOrder = coffeeCart.map((coffee) => {
+      const complementsWereSelected = complementsSelected.find(
+        (item) => item.recipe_id === coffee.recipe_id,
+      )
+      if (complementsWereSelected) {
+        const complementsSelected = complementsWereSelected.ingredients
+        return {
+          ...coffee,
+          complements: complementsSelected,
+        }
+      } else {
+        return coffee
+      }
+    })
+
+    registerSelectedCoffees(finalOrder)
+
+    const ordersById: Order[] = finalOrder.map((coffee) => {
+      const complementIdsArray = coffee.complements.map(
+        (complement) => complement.ingredient_id,
+      )
+      return {
+        recipe_id: coffee.recipe_id,
+        complement_ids: complementIdsArray,
+      }
+    })
+
+    if (activeUser) {
+      const requestBody: RegisterOrderApiRequest = {
+        orders: ordersById,
+        user_id: activeUser.id,
+      }
+
+      try {
+        await api.post('/ordercoffee', { requestBody })
+        navigate('/success', { replace: true })
+      } catch (error: any) {
+        console.log(error.response)
+      }
+    }
   }
 
   return (
@@ -192,7 +243,7 @@ export function Complements() {
         Adicione complementos ao seu pedido
       </InstructionsParagraph>
       <SelectedCoffeesWrapper>
-        {coffeeCartWithComplements.map((coffee) => (
+        {coffeeCartWithPossibleComplements.map((coffee) => (
           <SelectedCoffeeWrapper key={coffee.recipe_id}>
             <SelectedCoffeeItem>
               <img src={`../src/assets/${coffee.recipe_photo}`} alt="" />
@@ -225,7 +276,7 @@ export function Complements() {
                   </CoffeeComplementDetails>
                   <CheckboxButton
                     onClick={() =>
-                      handleCheckboxClick(coffee.recipe_id, complement)
+                      handleComplementSelection(coffee.recipe_id, complement)
                     }
                   >
                     {isComplementSelected(
@@ -242,7 +293,7 @@ export function Complements() {
             </CoffeeComplementsWrapper>
           </SelectedCoffeeWrapper>
         ))}
-        <ContinueButton onClick={handleContinueClick}>Continuar</ContinueButton>
+        <ContinueButton onClick={handleOrderButton}>Continuar</ContinueButton>
         <GoBackButton
           onClick={() => {
             navigate('/order')

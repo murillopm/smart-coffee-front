@@ -16,6 +16,7 @@ type Coffee = {
 }
 
 type User = {
+  id: number
   name: string
   email: string
   couponCode: string
@@ -26,6 +27,7 @@ interface CoffeeCartContextType {
   coffeeCart: Coffee[]
   registerActiveUser: (data: User) => void
   registerSelectedCoffees: (data: Coffee[]) => void
+  clearUserData: () => void
 }
 
 interface CartContextProviderProps {
@@ -48,6 +50,11 @@ export function CoffeeCartContextProvider({
     setCoffeeCart(data)
   }
 
+  function clearUserData() {
+    setActiveUser(undefined)
+    setCoffeeCart([])
+  }
+
   return (
     <CoffeeCartContext.Provider
       value={{
@@ -55,6 +62,7 @@ export function CoffeeCartContextProvider({
         coffeeCart,
         registerActiveUser,
         registerSelectedCoffees,
+        clearUserData,
       }}
     >
       {children}

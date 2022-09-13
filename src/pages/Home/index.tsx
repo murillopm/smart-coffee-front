@@ -20,6 +20,7 @@ import { api } from '../../services/api'
 interface RegisterUserApiResponse {
   message: string
   user: {
+    id: number
     name: string
     email: string
     couponCode: string
@@ -49,17 +50,12 @@ export function Home() {
   const navigate = useNavigate()
 
   async function handleRegisterSubmit(user: RegisterFormInputs) {
-    console.log('entrou')
     try {
-      console.log('dentro do try')
       const { data } = await api.post<RegisterUserApiResponse>('/register', {
         name: user.name,
         email: user.email,
       })
-      console.log(data)
-      console.log('vai registrar')
       registerActiveUser(data.user)
-      console.log('registrou')
       navigate('/order', { replace: true })
     } catch (error: any) {
       console.log(error.response)

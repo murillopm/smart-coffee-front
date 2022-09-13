@@ -87,7 +87,7 @@ export function Order() {
     )
   }
 
-  function handleCheckboxClick(recipeId: number) {
+  function handleCoffeeSelection(recipeId: number) {
     const isCoffeeAlreadySelected = selectedCoffees.find(
       (recipe) => recipe.recipe_id === recipeId,
     )
@@ -111,7 +111,7 @@ export function Order() {
   function handleContinueClick() {
     const isCartEmpty = selectedCoffees.length === 0
     if (isCartEmpty) {
-      console.log('nao quer cafe')
+      navigate('/success', { replace: true })
     } else {
       registerSelectedCoffees(selectedCoffees)
       navigate('/order/complements', { replace: true })
@@ -133,7 +133,7 @@ export function Order() {
               </CoffeePreparationTime>
             </CoffeeDetails>
             <CheckboxButton
-              onClick={() => handleCheckboxClick(coffee.recipe_id)}
+              onClick={() => handleCoffeeSelection(coffee.recipe_id)}
               isAllowed={
                 isCoffeeSelected(coffee.recipe_id) || isCoffeeAdditionAllowed
               }
