@@ -46,7 +46,7 @@ export const OrderTimeLeftInformation = styled.div`
 `
 
 export const CompletedPreparationInformation = styled.p`
-  margin: 200px 0 219px;
+  margin: 200px 0 190px;
   text-align: center;
   width: 80%;
   font-size: 1.5rem;

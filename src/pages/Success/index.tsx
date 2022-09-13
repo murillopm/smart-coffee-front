@@ -72,7 +72,7 @@ export function Success() {
   const successMessage =
     coffeeCart.length === 0
       ? 'Uma pena que você não tomou um de nossos cafés. Fica para uma próxima!'
-      : 'Seu pedido já está pronto para ser retirado. Obrigado!'
+      : 'Seu pedido já se encontra pronto para ser retirado. Obrigado pela confiança!'
 
   return (
     <SuccessPageWrapper>
