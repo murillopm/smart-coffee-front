@@ -4,6 +4,7 @@ export const defaultTheme = {
   blue: '#324759',
   'green-100': '#4ED9A6',
   'green-200': '#3BBF82',
+  'green-hover': '#2B8C5F',
   background: '#FFFFFF',
   'gray-100': '#F8F8F8',
   'gray-200': '#CFCFCF',
@@ -11,6 +12,9 @@ export const defaultTheme = {
   'gray-300': '#C8C8C8',
   'gray-800': '#737272',
   'gray-900': '#212121',
-  'brown-100': '#A1958A',
+  'brown-100': '#887A6D',
+  'brown-150': '#715332',
   'brown-200': '#503A23',
+  orange: '#D15F41',
+  'orange-hover': '#B5492C',
 } as const

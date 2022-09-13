@@ -13,6 +13,7 @@ import { CheckCircle, Circle, ClockClockwise } from 'phosphor-react'
 import { CoffeeCartContext } from '../../contexts/CartContext'
 import { useNavigate } from 'react-router-dom'
 import { BrandHeader } from '../../components/BrandHeader'
+import { calculateCoffeePreparationTime } from '../../utils/CoffeePreparationToString'
 
 type Ingredient = {
   ingredient_id: number
@@ -26,16 +27,30 @@ type Coffee = {
   recipe_name: string
   recipe_photo: string
   ingredients: Ingredient[]
+  complements: Ingredient[]
 }
 
 type RecipesResponseData = {
-  results: Coffee[]
+  results: {
+    recipe_id: number
+    recipe_name: string
+    recipe_photo: string
+    ingredients: Ingredient[]
+  }[]
 }
 
 export function Order() {
   const [coffeeList, setCoffeeList] = useState<Coffee[]>([])
-  const [selectedCoffees, setSelectedCoffees] = useState<Coffee[]>([])
-  const { activeUser, registerSelectedCoffees } = useContext(CoffeeCartContext)
+  const { activeUser, registerSelectedCoffees, coffeeCart } =
+    useContext(CoffeeCartContext)
+  const [selectedCoffees, setSelectedCoffees] = useState<Coffee[]>(() => {
+    const isCartEmpty = coffeeCart.length === 0
+    if (!isCartEmpty) {
+      return coffeeCart
+    } else {
+      return []
+    }
+  })
   const navigate = useNavigate()
 
   const maxCoffeesToBeSelected = 2
@@ -45,7 +60,13 @@ export function Order() {
   async function fetchRecipes() {
     try {
       const { data } = await api.get<RecipesResponseData>('/recipes')
-      setCoffeeList(data.results)
+      const coffeeList = data.results.map((coffee) => {
+        return {
+          ...coffee,
+          complements: [],
+        }
+      })
+      setCoffeeList(coffeeList)
     } catch (error: any) {
       console.log(error.response.data.error)
     }
@@ -58,19 +79,6 @@ export function Order() {
       navigate('/', { replace: true })
     }
   }, [activeUser, navigate])
-
-  function calculateCoffeePreparationTime(ingredients: Ingredient[]) {
-    const totalSeconds = ingredients.reduce((acc, ingredient) => {
-      return acc + ingredient.ingredient_preparation_time
-    }, 0)
-
-    const minutes = Math.floor(totalSeconds / 60)
-      .toString()
-      .padStart(2, '0')
-    const seconds = (totalSeconds % 60).toString().padStart(2, '0')
-
-    return minutes + ':' + seconds + ' min'
-  }
 
   function isCoffeeSelected(recipeId: number) {
     return (
@@ -106,6 +114,7 @@ export function Order() {
       console.log('nao quer cafe')
     } else {
       registerSelectedCoffees(selectedCoffees)
+      navigate('/order/complements', { replace: true })
     }
   }
 

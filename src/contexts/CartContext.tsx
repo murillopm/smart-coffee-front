@@ -12,6 +12,7 @@ type Coffee = {
   recipe_name: string
   recipe_photo: string
   ingredients: Ingredient[]
+  complements: Ingredient[]
 }
 
 type User = {
@@ -51,8 +52,8 @@ export function CoffeeCartContextProvider({
     <CoffeeCartContext.Provider
       value={{
         activeUser,
-        registerActiveUser,
         coffeeCart,
+        registerActiveUser,
         registerSelectedCoffees,
       }}
     >
