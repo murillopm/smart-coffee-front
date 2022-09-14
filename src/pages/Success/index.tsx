@@ -1,10 +1,8 @@
-import { ArrowCounterClockwise } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { differenceInSeconds } from 'date-fns'
 import { ToastContainer, toast } from 'react-toastify'
-import { BrandHeader } from '../../components/BrandHeader'
-import { CoffeeCartContext } from '../../contexts/CartContext'
-import { convertCoffeePreparationTimeToString } from '../../utils/CoffeePreparationToString'
+import { ArrowCounterClockwise } from 'phosphor-react'
 import {
   ButtonsWrapper,
   CompletedPreparationInformation,
@@ -18,12 +16,14 @@ import {
   SuccessTitle,
 } from './styles'
 
-import { differenceInSeconds } from 'date-fns'
+import { CoffeeCartContext } from '../../contexts/CartContext'
+import { BrandHeader } from '../../components/BrandHeader'
+import { convertCoffeePreparationTimeToString } from '../../utils/CoffeePreparationToString'
 
 export function Success() {
   const { activeUser, coffeeCart, clearUserData } =
     useContext(CoffeeCartContext)
-  const [secondsPassed, setSecondsPassed] = useState(45)
+  const [secondsPassed, setSecondsPassed] = useState(0)
   const navigate = useNavigate()
 
   const totalPreparationTime = coffeeCart.reduce((acc, coffee) => {

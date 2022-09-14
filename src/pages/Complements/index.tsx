@@ -1,13 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CheckCircle, Circle, ClockClockwise } from 'phosphor-react'
-import { BrandHeader } from '../../components/BrandHeader'
-import { CoffeeCartContext } from '../../contexts/CartContext'
-import { api } from '../../services/api'
-import {
-  calculateCoffeePreparationTime,
-  convertCoffeePreparationTimeToString,
-} from '../../utils/CoffeePreparationToString'
 import {
   CheckboxButton,
   CoffeeComplementDetails,
@@ -25,16 +18,19 @@ import {
   SelectedCoffeeWrapper,
 } from './styles'
 
+import { CoffeeCartContext } from '../../contexts/CartContext'
+import { api } from '../../services/api'
+import { BrandHeader } from '../../components/BrandHeader'
+import {
+  calculateCoffeePreparationTime,
+  convertCoffeePreparationTimeToString,
+} from '../../utils/CoffeePreparationToString'
+
 type Ingredient = {
   ingredient_id: number
   ingredient_name: string
   ingredient_preparation_time: number
   ingredient_photo: string
-}
-
-type ComplementsByCoffee = {
-  recipe_id: number
-  ingredients: Ingredient[]
 }
 
 type Coffee = {
@@ -43,6 +39,11 @@ type Coffee = {
   recipe_photo: string
   ingredients: Ingredient[]
   complements: Ingredient[]
+}
+
+type ComplementsByCoffee = {
+  recipe_id: number
+  ingredients: Ingredient[]
 }
 
 interface GetComplementsApiResponse {

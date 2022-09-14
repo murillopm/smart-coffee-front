@@ -1,3 +1,7 @@
+import { useContext, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import * as AlertDialog from '@radix-ui/react-alert-dialog'
+import { CheckCircle, Circle, ClockClockwise } from 'phosphor-react'
 import {
   CheckboxButton,
   CoffeeDetails,
@@ -7,12 +11,11 @@ import {
   CoffeeItem,
   CoffeesWrapper,
 } from './styles'
-import { useContext, useEffect, useState } from 'react'
-import { api } from '../../services/api'
-import { CheckCircle, Circle, ClockClockwise } from 'phosphor-react'
+
 import { CoffeeCartContext } from '../../contexts/CartContext'
-import { useNavigate } from 'react-router-dom'
+import { api } from '../../services/api'
 import { BrandHeader } from '../../components/BrandHeader'
+import { OrderAlertDialog } from '../../components/OrderAlertDialog'
 import { calculateCoffeePreparationTime } from '../../utils/CoffeePreparationToString'
 
 type Ingredient = {
@@ -51,6 +54,7 @@ export function Order() {
       return []
     }
   })
+  const [isAlertDialogOpen, setIsAlertDialog] = useState(false)
   const navigate = useNavigate()
 
   const maxCoffeesToBeSelected = 2
@@ -111,11 +115,15 @@ export function Order() {
   function handleContinueClick() {
     const isCartEmpty = selectedCoffees.length === 0
     if (isCartEmpty) {
-      navigate('/success', { replace: true })
+      setIsAlertDialog(true)
     } else {
       registerSelectedCoffees(selectedCoffees)
       navigate('/order/complements', { replace: true })
     }
+  }
+
+  function toggleAlertDialog() {
+    setIsAlertDialog((state) => !state)
   }
 
   return (
@@ -148,6 +156,12 @@ export function Order() {
         ))}
       </CoffeesWrapper>
       <ContinueButton onClick={handleContinueClick}>Continuar</ContinueButton>
+      <AlertDialog.Root
+        open={isAlertDialogOpen}
+        onOpenChange={toggleAlertDialog}
+      >
+        <OrderAlertDialog />
+      </AlertDialog.Root>
     </OrderPageWrapper>
   )
 }
