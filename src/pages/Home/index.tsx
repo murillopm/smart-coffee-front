@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import zod from 'zod'
+import { ToastContainer, toast } from 'react-toastify'
+
 import {
   HomeWrapper,
   InputError,
@@ -58,7 +60,15 @@ export function Home() {
       registerActiveUser(data.user)
       navigate('/order', { replace: true })
     } catch (error: any) {
-      console.log(error.response)
+      toast.error('Usuário já registrado', {
+        position: 'bottom-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
     }
   }
 
@@ -78,6 +88,21 @@ export function Home() {
         </InputWrapper>
         <RegisterButton>Cadastrar</RegisterButton>
       </RegisterForm>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        toastStyle={{
+          backgroundColor: '#F29B91',
+          color: 'white',
+        }}
+      />
     </HomeWrapper>
   )
 }

@@ -1,6 +1,7 @@
 import { ArrowCounterClockwise } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify'
 import { BrandHeader } from '../../components/BrandHeader'
 import { CoffeeCartContext } from '../../contexts/CartContext'
 import { convertCoffeePreparationTimeToString } from '../../utils/CoffeePreparationToString'
@@ -11,6 +12,7 @@ import {
   OrderInformationWrapper,
   OrderTimeLeftInformation,
   PrintCouponButton,
+  ProgressBarHtml,
   RepeatButton,
   SuccessPageWrapper,
   SuccessTitle,
@@ -21,7 +23,7 @@ import { differenceInSeconds } from 'date-fns'
 export function Success() {
   const { activeUser, coffeeCart, clearUserData } =
     useContext(CoffeeCartContext)
-  const [secondsPassed, setSecondsPassed] = useState(0)
+  const [secondsPassed, setSecondsPassed] = useState(45)
   const navigate = useNavigate()
 
   const totalPreparationTime = coffeeCart.reduce((acc, coffee) => {
@@ -74,6 +76,20 @@ export function Success() {
       ? 'Uma pena que você não tomou um de nossos cafés. Fica para uma próxima!'
       : 'Seu pedido já se encontra pronto para ser retirado. Obrigado pela confiança!'
 
+  function printTicket() {
+    toast.success('Cupom impresso', {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    })
+  }
+
+  const progressValue = (secondsPassed / totalPreparationTime) * 100
+
   return (
     <SuccessPageWrapper>
       <BrandHeader />
@@ -84,6 +100,7 @@ export function Success() {
             <OrderTimeLeftInformation>
               <p>{convertCoffeePreparationTimeToString(timeLeft)}</p>
               <span>tempo restante para ficar pronto</span>
+              <ProgressBarHtml max="100" value={progressValue} />
             </OrderTimeLeftInformation>
           </>
         ) : (
@@ -97,10 +114,25 @@ export function Success() {
         <RepeatButton onClick={handleRepeatAction}>
           <ArrowCounterClockwise size={32} weight="bold" color="white" />
         </RepeatButton>
-        <PrintCouponButton onClick={() => console.log('impresso')}>
+        <PrintCouponButton onClick={printTicket}>
           Imprimir cupom
         </PrintCouponButton>
       </ButtonsWrapper>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        toastStyle={{
+          backgroundColor: '#2B8C5F',
+          color: 'white',
+        }}
+      />
     </SuccessPageWrapper>
   )
 }

@@ -24,7 +24,7 @@ export const OrderInformationWrapper = styled.div`
 `
 
 export const OrderTimeLeftInformation = styled.div`
-  margin: 160px 0;
+  margin: 160px 0 135px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -46,11 +46,31 @@ export const OrderTimeLeftInformation = styled.div`
 `
 
 export const CompletedPreparationInformation = styled.p`
-  margin: 200px 0 190px;
+  margin: 200px 0 195px;
   text-align: center;
   width: 80%;
   font-size: 1.5rem;
   color: ${(props) => props.theme['green-200']};
+`
+
+export const ProgressBarHtml = styled.progress`
+  margin-top: 10px;
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  height: 15px;
+
+  ::-webkit-progress-bar {
+    background-color: ${(props) => props.theme['gray-250']};
+    border-radius: 99999px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+  }
+
+  ::-webkit-progress-value {
+    background-color: ${(props) => props.theme['green-hover']};
+    border-radius: 99999px;
+  }
 `
 
 export const CouponCodeBox = styled.p`
